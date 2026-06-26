@@ -1,0 +1,1945 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NeuroVision — Intelligent Face Recognition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #03050f;
+        --bg2: #070d1f;
+        --panel: #0b1229;
+        --panel2: #0f1836;
+        --border: rgba(0, 200, 255, 0.12);
+        --border2: rgba(0, 200, 255, 0.25);
+        --cyan: #00c8ff;
+        --cyan2: #00efff;
+        --violet: #7c3aed;
+        --violet2: #a855f7;
+        --green: #00ff88;
+        --red: #ff3366;
+        --yellow: #ffd700;
+        --text: #e0f4ff;
+        --text2: #7ab8d0;
+        --text3: #3a6070;
+        --glow: 0 0 20px rgba(0, 200, 255, 0.3);
+        --glow2: 0 0 40px rgba(0, 200, 255, 0.15);
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "DM Sans", sans-serif;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* ─── Background ─── */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(
+            ellipse 80% 40% at 20% 0%,
+            rgba(0, 100, 200, 0.12) 0%,
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse 60% 30% at 80% 100%,
+            rgba(124, 58, 237, 0.1) 0%,
+            transparent 60%
+          ),
+          repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 59px,
+            rgba(0, 200, 255, 0.025) 60px
+          ),
+          repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 59px,
+            rgba(0, 200, 255, 0.025) 60px
+          );
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .wrap {
+        position: relative;
+        z-index: 1;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      /* ─── Header ─── */
+      header {
+        border-bottom: 1px solid var(--border);
+        background: rgba(7, 13, 31, 0.85);
+        backdrop-filter: blur(20px);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .header-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 64px;
+      }
+      .logo {
+        font-family: "Orbitron", sans-serif;
+        font-weight: 900;
+        font-size: 1.35rem;
+        letter-spacing: 2px;
+        background: linear-gradient(135deg, var(--cyan2), var(--violet2));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .logo-icon {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, var(--cyan), var(--violet));
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        -webkit-background-clip: unset;
+        -webkit-text-fill-color: unset;
+        background-clip: unset;
+        box-shadow: 0 0 16px rgba(0, 200, 255, 0.4);
+        flex-shrink: 0;
+      }
+      .status-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: "Space Mono", monospace;
+        font-size: 0.7rem;
+        color: var(--green);
+        background: rgba(0, 255, 136, 0.06);
+        border: 1px solid rgba(0, 255, 136, 0.2);
+        padding: 6px 14px;
+        border-radius: 100px;
+      }
+      .status-dot {
+        width: 7px;
+        height: 7px;
+        background: var(--green);
+        border-radius: 50%;
+        animation: pulse 2s ease-in-out infinite;
+        box-shadow: 0 0 8px var(--green);
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.4;
+        }
+      }
+
+      /* ─── Nav Tabs ─── */
+      .nav-tabs {
+        display: flex;
+        gap: 4px;
+        background: rgba(11, 18, 41, 0.8);
+        border-bottom: 1px solid var(--border);
+        padding: 0 24px;
+        overflow-x: auto;
+      }
+      .tab-btn {
+        font-family: "Space Mono", monospace;
+        font-size: 0.72rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 14px 22px;
+        border: none;
+        background: none;
+        color: var(--text3);
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition: all 0.25s;
+        white-space: nowrap;
+      }
+      .tab-btn:hover {
+        color: var(--text2);
+      }
+      .tab-btn.active {
+        color: var(--cyan);
+        border-bottom-color: var(--cyan);
+        text-shadow: 0 0 10px var(--cyan);
+      }
+
+      /* ─── Sections ─── */
+      .section {
+        display: none;
+        padding: 40px 0 80px;
+        animation: fadeIn 0.3s ease;
+      }
+      .section.active {
+        display: block;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      /* ─── Section Header ─── */
+      .sec-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: var(--cyan2);
+        text-shadow: 0 0 20px rgba(0, 200, 255, 0.4);
+        margin-bottom: 6px;
+      }
+      .sec-sub {
+        font-size: 0.9rem;
+        color: var(--text2);
+        margin-bottom: 36px;
+        line-height: 1.6;
+      }
+
+      /* ─── Cards / Panels ─── */
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 28px;
+        transition: border-color 0.25s;
+      }
+      .card:hover {
+        border-color: var(--border2);
+      }
+
+      .card-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--cyan);
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .card-title::before {
+        content: "";
+        width: 3px;
+        height: 16px;
+        background: linear-gradient(to bottom, var(--cyan), var(--violet));
+        border-radius: 2px;
+      }
+
+      /* ─── Grid ─── */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+      }
+      @media (max-width: 900px) {
+        .grid-2,
+        .grid-3 {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* ─── Camera / Preview ─── */
+      .cam-wrap {
+        position: relative;
+        background: #010409;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        aspect-ratio: 4/3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #videoEl,
+      #canvasPreview {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        border-radius: 12px;
+      }
+      .cam-overlay {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .face-frame {
+        width: 140px;
+        height: 160px;
+        border: 2px solid rgba(0, 200, 255, 0.4);
+        border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+        box-shadow: 0 0 20px rgba(0, 200, 255, 0.2),
+          inset 0 0 20px rgba(0, 200, 255, 0.05);
+        animation: framePulse 3s ease-in-out infinite;
+      }
+      @keyframes framePulse {
+        0%,
+        100% {
+          border-color: rgba(0, 200, 255, 0.3);
+          box-shadow: 0 0 20px rgba(0, 200, 255, 0.15);
+        }
+        50% {
+          border-color: rgba(0, 200, 255, 0.7);
+          box-shadow: 0 0 30px rgba(0, 200, 255, 0.35);
+        }
+      }
+      .cam-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        color: var(--text3);
+        font-family: "Space Mono", monospace;
+        font-size: 0.8rem;
+        text-align: center;
+        padding: 20px;
+      }
+      .cam-placeholder .icon {
+        font-size: 3rem;
+      }
+
+      /* ─── Buttons ─── */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 10px;
+        font-family: "Space Mono", monospace;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, var(--cyan), #0080c0);
+        color: #fff;
+        box-shadow: 0 4px 20px rgba(0, 200, 255, 0.25);
+      }
+      .btn-primary:hover {
+        box-shadow: 0 4px 30px rgba(0, 200, 255, 0.5);
+        transform: translateY(-1px);
+      }
+      .btn-secondary {
+        background: transparent;
+        color: var(--cyan);
+        border: 1px solid var(--border2);
+      }
+      .btn-secondary:hover {
+        background: rgba(0, 200, 255, 0.08);
+      }
+      .btn-violet {
+        background: linear-gradient(135deg, var(--violet), var(--violet2));
+        color: #fff;
+        box-shadow: 0 4px 20px rgba(124, 58, 237, 0.25);
+      }
+      .btn-violet:hover {
+        box-shadow: 0 4px 30px rgba(124, 58, 237, 0.5);
+        transform: translateY(-1px);
+      }
+      .btn-danger {
+        background: transparent;
+        color: var(--red);
+        border: 1px solid rgba(255, 51, 102, 0.25);
+        font-size: 0.65rem;
+        padding: 7px 14px;
+      }
+      .btn-danger:hover {
+        background: rgba(255, 51, 102, 0.08);
+      }
+      .btn-sm {
+        padding: 9px 16px;
+        font-size: 0.68rem;
+      }
+      .btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        transform: none !important;
+      }
+      .btn-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 16px;
+      }
+
+      /* ─── Form ─── */
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      @media (max-width: 600px) {
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+      .field label {
+        font-family: "Space Mono", monospace;
+        font-size: 0.65rem;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--text2);
+      }
+      .field input,
+      .field select {
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 11px 14px;
+        color: var(--text);
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.95rem;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        width: 100%;
+      }
+      .field input::placeholder {
+        color: var(--text3);
+      }
+      .field input:focus,
+      .field select:focus {
+        border-color: var(--cyan);
+        box-shadow: 0 0 0 3px rgba(0, 200, 255, 0.1);
+      }
+      .field select option {
+        background: var(--bg2);
+      }
+
+      /* ─── Upload Zone ─── */
+      .upload-zone {
+        border: 2px dashed var(--border2);
+        border-radius: 12px;
+        padding: 32px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.25s;
+        background: rgba(0, 200, 255, 0.02);
+      }
+      .upload-zone:hover,
+      .upload-zone.drag-over {
+        border-color: var(--cyan);
+        background: rgba(0, 200, 255, 0.06);
+        box-shadow: var(--glow2);
+      }
+      .upload-zone .icon {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+      }
+      .upload-zone p {
+        color: var(--text2);
+        font-size: 0.9rem;
+      }
+      .upload-zone span {
+        color: var(--cyan);
+        font-weight: 500;
+      }
+      #fileInput,
+      #regFileInput {
+        display: none;
+      }
+
+      /* ─── Result Panel ─── */
+      .result-panel {
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+      .result-matched {
+        background: linear-gradient(
+          135deg,
+          rgba(0, 255, 136, 0.06),
+          rgba(0, 200, 255, 0.04)
+        );
+        border-color: rgba(0, 255, 136, 0.3);
+      }
+      .result-unmatched {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 51, 102, 0.06),
+          rgba(255, 100, 0, 0.03)
+        );
+        border-color: rgba(255, 51, 102, 0.25);
+      }
+      .result-inner {
+        padding: 28px;
+      }
+      .result-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 24px;
+      }
+      .result-icon {
+        font-size: 2rem;
+      }
+      .result-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+      }
+      .result-matched .result-title {
+        color: var(--green);
+        text-shadow: 0 0 10px var(--green);
+      }
+      .result-unmatched .result-title {
+        color: var(--red);
+      }
+
+      .person-card {
+        display: flex;
+        gap: 24px;
+        align-items: flex-start;
+      }
+      .person-photo {
+        width: 100px;
+        height: 100px;
+        border-radius: 12px;
+        object-fit: cover;
+        border: 2px solid var(--border2);
+        flex-shrink: 0;
+        background: var(--panel2);
+      }
+      .person-photo-placeholder {
+        width: 100px;
+        height: 100px;
+        border-radius: 12px;
+        background: var(--panel2);
+        border: 2px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        flex-shrink: 0;
+      }
+      .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        flex: 1;
+      }
+      .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+      .info-label {
+        font-family: "Space Mono", monospace;
+        font-size: 0.6rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--text3);
+      }
+      .info-value {
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--text);
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 100px;
+        font-family: "Space Mono", monospace;
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+      }
+      .badge-adult {
+        background: rgba(0, 200, 255, 0.12);
+        color: var(--cyan);
+        border: 1px solid rgba(0, 200, 255, 0.25);
+      }
+      .badge-teen {
+        background: rgba(168, 85, 247, 0.12);
+        color: var(--violet2);
+        border: 1px solid rgba(168, 85, 247, 0.25);
+      }
+      .badge-male {
+        background: rgba(0, 150, 255, 0.1);
+        color: #4dabf7;
+        border: 1px solid rgba(0, 150, 255, 0.2);
+      }
+      .badge-female {
+        background: rgba(255, 100, 200, 0.1);
+        color: #ff88cc;
+        border: 1px solid rgba(255, 100, 200, 0.2);
+      }
+
+      .confidence-bar-wrap {
+        margin-top: 16px;
+      }
+      .confidence-label {
+        display: flex;
+        justify-content: space-between;
+        font-family: "Space Mono", monospace;
+        font-size: 0.7rem;
+        color: var(--text2);
+        margin-bottom: 6px;
+      }
+      .confidence-bar {
+        height: 6px;
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      .confidence-fill {
+        height: 100%;
+        border-radius: 3px;
+        background: linear-gradient(90deg, var(--cyan), var(--green));
+        box-shadow: 0 0 8px var(--cyan);
+        transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* ─── Stats ─── */
+      .stat-card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 22px;
+        text-align: center;
+        transition: all 0.25s;
+      }
+      .stat-card:hover {
+        border-color: var(--border2);
+        transform: translateY(-2px);
+      }
+      .stat-num {
+        font-family: "Orbitron", sans-serif;
+        font-size: 2.4rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, var(--cyan2), var(--violet2));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1;
+        margin-bottom: 8px;
+      }
+      .stat-label {
+        font-size: 0.8rem;
+        color: var(--text2);
+        letter-spacing: 0.5px;
+      }
+
+      /* ─── Database Table ─── */
+      .db-table-wrap {
+        overflow-x: auto;
+        border-radius: 12px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.88rem;
+      }
+      thead th {
+        font-family: "Space Mono", monospace;
+        font-size: 0.62rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--text3);
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+      tbody tr {
+        border-bottom: 1px solid rgba(0, 200, 255, 0.05);
+        transition: background 0.15s;
+      }
+      tbody tr:hover {
+        background: rgba(0, 200, 255, 0.04);
+      }
+      tbody td {
+        padding: 14px 16px;
+        color: var(--text);
+        vertical-align: middle;
+      }
+      .thumb {
+        width: 42px;
+        height: 42px;
+        border-radius: 8px;
+        object-fit: cover;
+        border: 1px solid var(--border);
+        background: var(--panel2);
+      }
+      .thumb-placeholder {
+        width: 42px;
+        height: 42px;
+        border-radius: 8px;
+        background: var(--panel2);
+        border: 1px solid var(--border);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+      }
+
+      /* ─── Toast ─── */
+      #toast {
+        position: fixed;
+        bottom: 32px;
+        right: 32px;
+        padding: 14px 22px;
+        border-radius: 12px;
+        font-family: "Space Mono", monospace;
+        font-size: 0.75rem;
+        z-index: 9999;
+        transform: translateY(20px);
+        opacity: 0;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        max-width: 340px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        pointer-events: none;
+      }
+      #toast.show {
+        transform: none;
+        opacity: 1;
+      }
+      #toast.success {
+        background: rgba(0, 30, 20, 0.95);
+        border: 1px solid rgba(0, 255, 136, 0.3);
+        color: var(--green);
+        box-shadow: 0 4px 30px rgba(0, 255, 136, 0.2);
+      }
+      #toast.error {
+        background: rgba(30, 5, 10, 0.95);
+        border: 1px solid rgba(255, 51, 102, 0.3);
+        color: var(--red);
+        box-shadow: 0 4px 30px rgba(255, 51, 102, 0.2);
+      }
+      #toast.info {
+        background: rgba(5, 15, 35, 0.95);
+        border: 1px solid var(--border2);
+        color: var(--cyan);
+      }
+
+      /* ─── Loading ─── */
+      .spinner {
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(0, 200, 255, 0.2);
+        border-top-color: var(--cyan);
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+        display: inline-block;
+        flex-shrink: 0;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* ─── Docs ─── */
+      .doc-block {
+        background: rgba(0, 0, 0, 0.35);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--cyan);
+        border-radius: 0 10px 10px 0;
+        padding: 18px 22px;
+        margin: 16px 0;
+      }
+      .doc-block h4 {
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.8rem;
+        color: var(--cyan);
+        margin-bottom: 10px;
+        letter-spacing: 1px;
+      }
+      .doc-block p,
+      .doc-block li {
+        font-size: 0.88rem;
+        color: var(--text2);
+        line-height: 1.7;
+      }
+      .doc-block li {
+        margin-left: 18px;
+        margin-bottom: 4px;
+      }
+      .code-block {
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px;
+        font-family: "Space Mono", monospace;
+        font-size: 0.78rem;
+        color: var(--cyan2);
+        overflow-x: auto;
+        white-space: pre;
+        margin: 10px 0;
+      }
+      .step-num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        background: linear-gradient(135deg, var(--cyan), var(--violet));
+        border-radius: 50%;
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.7rem;
+        font-weight: 700;
+        margin-right: 10px;
+        flex-shrink: 0;
+      }
+      .step {
+        display: flex;
+        align-items: flex-start;
+        gap: 0;
+        margin-bottom: 18px;
+      }
+
+      /* ─── Image preview ─── */
+      #regImgPreview,
+      #idImgPreview {
+        display: none;
+        width: 100%;
+        max-height: 220px;
+        object-fit: contain;
+        border-radius: 10px;
+        border: 1px solid var(--border2);
+        margin-top: 12px;
+      }
+
+      .scan-line {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--cyan),
+          transparent
+        );
+        top: 0;
+        animation: scan 2.5s ease-in-out infinite;
+        opacity: 0;
+      }
+      .scanning .scan-line {
+        opacity: 1;
+      }
+      @keyframes scan {
+        0% {
+          top: 0;
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          top: 100%;
+          opacity: 0;
+        }
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text3);
+        font-family: "Space Mono", monospace;
+        font-size: 0.8rem;
+      }
+      .empty-state .icon {
+        font-size: 3rem;
+        margin-bottom: 14px;
+        opacity: 0.4;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap header-inner">
+        <div class="logo">
+          <div class="logo-icon">🧠</div>
+          NEUROVISION
+        </div>
+        <div class="status-badge">
+          <div class="status-dot"></div>
+          SYSTEM ONLINE
+        </div>
+      </div>
+    </header>
+
+    <nav class="nav-tabs">
+      <div
+        class="wrap"
+        style="display: flex; gap: 4px; padding: 0; width: 100%"
+      >
+        <button class="tab-btn active" onclick="showTab('identify')">
+          ⊕ Identify
+        </button>
+        <button class="tab-btn" onclick="showTab('register')">
+          ＋ Register
+        </button>
+        <button class="tab-btn" onclick="showTab('database')">
+          ◈ Database
+        </button>
+        <button class="tab-btn" onclick="showTab('docs')">⊞ Setup Guide</button>
+      </div>
+    </nav>
+
+    <main class="wrap">
+      <!-- ═══ IDENTIFY ════════════════════════════════════════════════════════════ -->
+      <section id="sec-identify" class="section active">
+        <h2 class="sec-title">FACE IDENTIFICATION</h2>
+        <p class="sec-sub">
+          Capture via webcam or upload an image to identify a person in the
+          database.
+        </p>
+
+        <div class="grid-2">
+          <!-- Left: Input -->
+          <div>
+            <!-- Camera -->
+            <div class="card" style="margin-bottom: 20px">
+              <div class="card-title">Live Camera</div>
+              <div class="cam-wrap" id="camWrap">
+                <div class="scan-line" id="scanLine"></div>
+                <video
+                  id="videoEl"
+                  autoplay
+                  muted
+                  playsinline
+                  style="display: none"
+                ></video>
+                <canvas id="snapCanvas" style="display: none"></canvas>
+                <div class="cam-placeholder" id="camPlaceholder">
+                  <div class="icon">📷</div>
+                  <p>
+                    Camera is off<br /><span>Click Start Camera to begin</span>
+                  </p>
+                </div>
+                <div class="cam-overlay" id="camOverlay" style="display: none">
+                  <div class="face-frame"></div>
+                </div>
+              </div>
+              <div class="btn-row">
+                <button
+                  class="btn btn-secondary btn-sm"
+                  id="btnStartCam"
+                  onclick="startCamera()"
+                >
+                  ▶ Start Camera
+                </button>
+                <button
+                  class="btn btn-primary btn-sm"
+                  id="btnCapture"
+                  onclick="captureFrame()"
+                  disabled
+                >
+                  ⊙ Capture & Identify
+                </button>
+                <button
+                  class="btn btn-secondary btn-sm"
+                  id="btnStopCam"
+                  onclick="stopCamera()"
+                  style="display: none"
+                >
+                  ■ Stop
+                </button>
+              </div>
+            </div>
+
+            <!-- Upload -->
+            <div class="card">
+              <div class="card-title">Upload Image</div>
+              <div
+                class="upload-zone"
+                id="idUploadZone"
+                onclick="document.getElementById('fileInput').click()"
+                ondragover="dragOver(event,'idUploadZone')"
+                ondragleave="dragLeave('idUploadZone')"
+                ondrop="dropFile(event,'fileInput','idUploadZone')"
+              >
+                <div class="icon">🖼️</div>
+                <p>Drag & drop or <span>browse</span> to upload</p>
+                <p
+                  style="
+                    font-size: 0.75rem;
+                    margin-top: 4px;
+                    color: var(--text3);
+                  "
+                >
+                  JPG, PNG, WEBP
+                </p>
+              </div>
+              <input
+                type="file"
+                id="fileInput"
+                accept="image/*"
+                onchange="handleFileSelect(event,'idImgPreview','identifyFromFile')"
+              />
+              <img id="idImgPreview" alt="Preview" />
+              <div class="btn-row" id="idFileBtnRow" style="display: none">
+                <button
+                  class="btn btn-primary btn-sm"
+                  onclick="identifyFromFile()"
+                >
+                  ⊙ Identify Person
+                </button>
+                <button
+                  class="btn btn-secondary btn-sm"
+                  onclick="clearIdFile()"
+                >
+                  ✕ Clear
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Result -->
+          <div>
+            <div class="card" style="min-height: 300px" id="idResultCard">
+              <div class="card-title">Identification Result</div>
+              <div id="idResultContent">
+                <div class="empty-state">
+                  <div class="icon">🔍</div>
+                  <p>Awaiting scan...<br />Use camera or upload to identify</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ REGISTER ════════════════════════════════════════════════════════════ -->
+      <section id="sec-register" class="section">
+        <h2 class="sec-title">REGISTER PERSON</h2>
+        <p class="sec-sub">
+          Add a new person to the NeuroVision database with their face data.
+        </p>
+
+        <div class="grid-2">
+          <!-- Left: Form -->
+          <div class="card">
+            <div class="card-title">Personal Details</div>
+            <div class="form-grid">
+              <div class="field">
+                <label>Full Name</label>
+                <input
+                  type="text"
+                  id="regName"
+                  placeholder="e.g. Arjun Sharma"
+                />
+              </div>
+              <div class="field">
+                <label>Age</label>
+                <input
+                  type="number"
+                  id="regAge"
+                  placeholder="e.g. 20"
+                  min="1"
+                  max="120"
+                />
+              </div>
+              <div class="field">
+                <label>Gender</label>
+                <select id="regGender">
+                  <option value="">Select gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div class="field" style="grid-column: 1/-1">
+                <label>Academic Course / Program</label>
+                <input
+                  type="text"
+                  id="regCourse"
+                  placeholder="e.g. B.Tech Computer Science"
+                />
+              </div>
+            </div>
+
+            <div style="margin-top: 24px">
+              <div class="card-title">Face Photo</div>
+              <!-- Reg Camera -->
+              <div class="cam-wrap" id="regCamWrap" style="margin-bottom: 12px">
+                <video
+                  id="regVideoEl"
+                  autoplay
+                  muted
+                  playsinline
+                  style="display: none"
+                ></video>
+                <canvas id="regSnapCanvas" style="display: none"></canvas>
+                <div class="cam-placeholder" id="regCamPlaceholder">
+                  <div class="icon">📷</div>
+                  <p>Camera off<br /><span>or upload below</span></p>
+                </div>
+                <div
+                  class="cam-overlay"
+                  id="regCamOverlay"
+                  style="display: none"
+                >
+                  <div class="face-frame"></div>
+                </div>
+              </div>
+              <div class="btn-row" style="margin-top: 8px; margin-bottom: 16px">
+                <button
+                  class="btn btn-secondary btn-sm"
+                  id="btnRegStartCam"
+                  onclick="startRegCamera()"
+                >
+                  ▶ Start Camera
+                </button>
+                <button
+                  class="btn btn-secondary btn-sm"
+                  id="btnRegCapture"
+                  onclick="captureRegFrame()"
+                  disabled
+                >
+                  ⊙ Take Photo
+                </button>
+                <button
+                  class="btn btn-secondary btn-sm"
+                  id="btnRegStopCam"
+                  onclick="stopRegCamera()"
+                  style="display: none"
+                >
+                  ■ Stop
+                </button>
+              </div>
+
+              <div
+                class="upload-zone"
+                onclick="document.getElementById('regFileInput').click()"
+                ondragover="dragOver(event,'regUploadZone')"
+                ondragleave="dragLeave('regUploadZone')"
+                ondrop="dropFile(event,'regFileInput','regUploadZone')"
+                id="regUploadZone"
+              >
+                <div class="icon">📁</div>
+                <p>Or upload a photo — <span>browse</span></p>
+              </div>
+              <input
+                type="file"
+                id="regFileInput"
+                accept="image/*"
+                onchange="handleRegFileSelect(event)"
+              />
+              <img id="regImgPreview" alt="Preview" />
+            </div>
+
+            <div class="btn-row" style="margin-top: 24px">
+              <button
+                class="btn btn-violet"
+                id="btnRegister"
+                onclick="registerPerson()"
+              >
+                ⊕ Register Person
+              </button>
+              <button class="btn btn-secondary" onclick="clearRegForm()">
+                ✕ Clear
+              </button>
+            </div>
+          </div>
+
+          <!-- Right: Preview / Info -->
+          <div>
+            <div class="card" style="margin-bottom: 20px">
+              <div class="card-title">Registration Preview</div>
+              <div id="regPreviewContent">
+                <div class="empty-state">
+                  <div class="icon">👤</div>
+                  <p>
+                    Fill in details and capture a photo<br />to preview before
+                    registering
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">Tips for Best Results</div>
+              <ul
+                style="
+                  list-style: none;
+                  display: flex;
+                  flex-direction: column;
+                  gap: 10px;
+                "
+              >
+                <li
+                  style="
+                    display: flex;
+                    gap: 10px;
+                    font-size: 0.85rem;
+                    color: var(--text2);
+                  "
+                >
+                  <span>✦</span>Use a well-lit, frontal face photo
+                </li>
+                <li
+                  style="
+                    display: flex;
+                    gap: 10px;
+                    font-size: 0.85rem;
+                    color: var(--text2);
+                  "
+                >
+                  <span>✦</span>Avoid glasses, masks, or heavy shadows
+                </li>
+                <li
+                  style="
+                    display: flex;
+                    gap: 10px;
+                    font-size: 0.85rem;
+                    color: var(--text2);
+                  "
+                >
+                  <span>✦</span>Ensure face is clearly visible and centered
+                </li>
+                <li
+                  style="
+                    display: flex;
+                    gap: 10px;
+                    font-size: 0.85rem;
+                    color: var(--text2);
+                  "
+                >
+                  <span>✦</span>One face per registration image
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ DATABASE ════════════════════════════════════════════════════════════ -->
+      <section id="sec-database" class="section">
+        <h2 class="sec-title">DATABASE</h2>
+        <p class="sec-sub">All registered persons in the NeuroVision system.</p>
+
+        <div class="grid-3" style="margin-bottom: 28px" id="statsGrid">
+          <div class="stat-card">
+            <div class="stat-num" id="statTotal">—</div>
+            <div class="stat-label">Total Registered</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="statAdults">—</div>
+            <div class="stat-label">Adults (18+)</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="statTeens">—</div>
+            <div class="stat-label">Teens (&lt;18)</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              margin-bottom: 20px;
+            "
+          >
+            <div class="card-title" style="margin-bottom: 0">
+              Registered Persons
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="loadDatabase()">
+              ↺ Refresh
+            </button>
+          </div>
+          <div class="db-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Photo</th>
+                  <th>Name</th>
+                  <th>Age</th>
+                  <th>Classification</th>
+                  <th>Gender</th>
+                  <th>Course</th>
+                  <th>Registered</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="dbTableBody">
+                <tr>
+                  <td colspan="8">
+                    <div class="empty-state">
+                      <div class="icon">⏳</div>
+                      <p>Loading...</p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ DOCS ════════════════════════════════════════════════════════════════ -->
+      <section id="sec-docs" class="section">
+        <h2 class="sec-title">SETUP GUIDE</h2>
+        <p class="sec-sub">
+          How to install, run, and populate the NeuroVision database.
+        </p>
+
+        <div class="grid-2">
+          <div>
+            <div class="card" style="margin-bottom: 20px">
+              <div class="card-title">System Requirements</div>
+              <div class="doc-block">
+                <h4>Prerequisites</h4>
+                <ul>
+                  <li>Python 3.8+ installed</li>
+                  <li>pip package manager</li>
+                  <li>CMake (required for dlib/face_recognition)</li>
+                  <li>Webcam (optional, for live capture)</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="card" style="margin-bottom: 20px">
+              <div class="card-title">Installation Steps</div>
+
+              <div class="step">
+                <span class="step-num">1</span>
+                <div style="flex: 1">
+                  <div
+                    style="
+                      font-weight: 500;
+                      margin-bottom: 6px;
+                      color: var(--text);
+                    "
+                  >
+                    Install CMake & dlib dependencies
+                  </div>
+                  <div class="code-block">
+                    sudo apt-get install cmake build-essential # Windows:
+                    install CMake from cmake.org
+                  </div>
+                </div>
+              </div>
+
+              <div class="step">
+                <span class="step-num">2</span>
+                <div style="flex: 1">
+                  <div
+                    style="
+                      font-weight: 500;
+                      margin-bottom: 6px;
+                      color: var(--text);
+                    "
+                  >
+                    Install Python dependencies
+                  </div>
+                  <div class="code-block">
+                    pip install flask face_recognition Pillow numpy
+                  </div>
+                </div>
+              </div>
+
+              <div class="step">
+                <span class="step-num">3</span>
+                <div style="flex: 1">
+                  <div
+                    style="
+                      font-weight: 500;
+                      margin-bottom: 6px;
+                      color: var(--text);
+                    "
+                  >
+                    Run the application
+                  </div>
+                  <div class="code-block">python app.py</div>
+                  <p
+                    style="
+                      font-size: 0.82rem;
+                      color: var(--text2);
+                      margin-top: 6px;
+                    "
+                  >
+                    Open browser →
+                    <strong style="color: var(--cyan)"
+                      >http://localhost:5000</strong
+                    >
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card" style="margin-bottom: 20px">
+              <div class="card-title">How to Upload Data to Database</div>
+
+              <div class="doc-block">
+                <h4>Method 1 — Web UI (Recommended)</h4>
+                <ol style="padding-left: 20px">
+                  <li>
+                    Go to the
+                    <strong style="color: var(--cyan)">Register</strong> tab
+                  </li>
+                  <li>Fill in Name, Age, Gender, Course</li>
+                  <li>Capture photo via webcam or upload an image</li>
+                  <li>
+                    Click
+                    <strong style="color: var(--violet2)"
+                      >Register Person</strong
+                    >
+                  </li>
+                  <li>Face encoding is extracted and saved automatically</li>
+                </ol>
+              </div>
+
+              <div class="doc-block">
+                <h4>Method 2 — Bulk Import via API (curl)</h4>
+                <p style="margin-bottom: 8px">
+                  POST to /api/register with JSON body:
+                </p>
+                <div class="code-block">
+                  curl -X POST http://localhost:5000/api/register \ -H
+                  "Content-Type: application/json" \ -d '{ "name": "Priya Nair",
+                  "age": 21, "gender": "Female", "course": "M.Sc Data Science",
+                  "image": "data:image/jpeg;base64,..." }'
+                </div>
+              </div>
+
+              <div class="doc-block">
+                <h4>Method 3 — Python Script (Batch Upload)</h4>
+                <div class="code-block">
+                  import requests, base64 def register(name, age, gender,
+                  course, img_path): with open(img_path, 'rb') as f: b64 =
+                  base64.b64encode(f.read()).decode()
+                  requests.post('http://localhost:5000/api/register', json={
+                  'name': name, 'age': age, 'gender': gender, 'course': course,
+                  'image': 'data:image/jpeg;base64,' + b64 }) register("Rahul
+                  Kumar", 19, "Male", "B.Tech CSE", "photos/rahul.jpg")
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">Database Location</div>
+              <div class="doc-block">
+                <h4>SQLite File</h4>
+                <p>The database is stored at:</p>
+                <div class="code-block">
+                  neurovision/ ├── database/ │ └── neurovision.db ← SQLite DB
+                  ├── app.py └── templates/ └── index.html
+                </div>
+                <p style="margin-top: 10px">
+                  Use
+                  <strong style="color: var(--cyan)"
+                    >DB Browser for SQLite</strong
+                  >
+                  (free GUI tool) to inspect or manually edit records.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Toast -->
+    <div id="toast"></div>
+
+    <script>
+      // ─── State ─────────────────────────────────────────────────────────────────
+      let stream = null,
+        regStream = null;
+      let idImageData = null,
+        regImageData = null;
+
+      // ─── Tab Navigation ─────────────────────────────────────────────────────────
+      function showTab(tab) {
+        document
+          .querySelectorAll(".section")
+          .forEach((s) => s.classList.remove("active"));
+        document
+          .querySelectorAll(".tab-btn")
+          .forEach((b) => b.classList.remove("active"));
+        document.getElementById("sec-" + tab).classList.add("active");
+        event.currentTarget.classList.add("active");
+        if (tab === "database") loadDatabase();
+      }
+
+      // ─── Toast ───────────────────────────────────────────────────────────────────
+      function toast(msg, type = "info") {
+        const el = document.getElementById("toast");
+        el.className = `show ${type}`;
+        el.innerHTML =
+          (type === "success" ? "✓" : type === "error" ? "✕" : "◈") + " " + msg;
+        clearTimeout(el._t);
+        el._t = setTimeout(() => el.classList.remove("show"), 1000);
+      }
+
+      // ─── Camera: Identify ────────────────────────────────────────────────────────
+      async function startCamera() {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "user" },
+          });
+          const v = document.getElementById("videoEl");
+          v.srcObject = stream;
+          v.style.display = "block";
+          document.getElementById("camPlaceholder").style.display = "none";
+          document.getElementById("camOverlay").style.display = "flex";
+          document.getElementById("btnCapture").disabled = false;
+          document.getElementById("btnStopCam").style.display = "inline-flex";
+          document.getElementById("btnStartCam").style.display = "none";
+        } catch (e) {
+          toast("Camera access denied: " + e.message, "error");
+        }
+      }
+      function stopCamera() {
+        if (stream) stream.getTracks().forEach((t) => t.stop());
+        stream = null;
+        document.getElementById("videoEl").style.display = "none";
+        document.getElementById("camPlaceholder").style.display = "flex";
+        document.getElementById("camOverlay").style.display = "none";
+        document.getElementById("btnCapture").disabled = true;
+        document.getElementById("btnStopCam").style.display = "none";
+        document.getElementById("btnStartCam").style.display = "inline-flex";
+      }
+      function captureFrame() {
+        const v = document.getElementById("videoEl");
+        const c = document.getElementById("snapCanvas");
+        c.width = v.videoWidth;
+        c.height = v.videoHeight;
+        c.getContext("2d").drawImage(v, 0, 0);
+        idImageData = c.toDataURL("image/jpeg", 0.9);
+        startScan();
+        identifyImage(idImageData);
+      }
+
+      // ─── Camera: Register ────────────────────────────────────────────────────────
+      async function startRegCamera() {
+        try {
+          regStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "user" },
+          });
+          const v = document.getElementById("regVideoEl");
+          v.srcObject = regStream;
+          v.style.display = "block";
+          document.getElementById("regCamPlaceholder").style.display = "none";
+          document.getElementById("regCamOverlay").style.display = "flex";
+          document.getElementById("btnRegCapture").disabled = false;
+          document.getElementById("btnRegStopCam").style.display =
+            "inline-flex";
+          document.getElementById("btnRegStartCam").style.display = "none";
+        } catch (e) {
+          toast("Camera access denied: " + e.message, "error");
+        }
+      }
+      function stopRegCamera() {
+        if (regStream) regStream.getTracks().forEach((t) => t.stop());
+        regStream = null;
+        document.getElementById("regVideoEl").style.display = "none";
+        document.getElementById("regCamPlaceholder").style.display = "flex";
+        document.getElementById("regCamOverlay").style.display = "none";
+        document.getElementById("btnRegCapture").disabled = true;
+        document.getElementById("btnRegStopCam").style.display = "none";
+        document.getElementById("btnRegStartCam").style.display = "inline-flex";
+      }
+      function captureRegFrame() {
+        const v = document.getElementById("regVideoEl");
+        const c = document.getElementById("regSnapCanvas");
+        c.width = v.videoWidth;
+        c.height = v.videoHeight;
+        c.getContext("2d").drawImage(v, 0, 0);
+        regImageData = c.toDataURL("image/jpeg", 0.9);
+        const p = document.getElementById("regImgPreview");
+        p.src = regImageData;
+        p.style.display = "block";
+        toast("Photo captured!", "success");
+        updateRegPreview();
+      }
+
+      // ─── File Handling ────────────────────────────────────────────────────────────
+      function handleFileSelect(e, previewId, cb) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const r = new FileReader();
+        r.onload = (ev) => {
+          idImageData = ev.target.result;
+          const p = document.getElementById(previewId);
+          p.src = idImageData;
+          p.style.display = "block";
+          document.getElementById("idFileBtnRow").style.display = "flex";
+          if (cb === "identifyFromFile") {
+          }
+        };
+        r.readAsDataURL(file);
+      }
+      function handleRegFileSelect(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const r = new FileReader();
+        r.onload = (ev) => {
+          regImageData = ev.target.result;
+          const p = document.getElementById("regImgPreview");
+          p.src = regImageData;
+          p.style.display = "block";
+          updateRegPreview();
+        };
+        r.readAsDataURL(file);
+      }
+      function identifyFromFile() {
+        if (!idImageData) return;
+        startScan();
+        identifyImage(idImageData);
+      }
+      function clearIdFile() {
+        idImageData = null;
+        document.getElementById("idImgPreview").style.display = "none";
+        document.getElementById("fileInput").value = "";
+        document.getElementById("idFileBtnRow").style.display = "none";
+        document.getElementById(
+          "idResultContent"
+        ).innerHTML = `<div class="empty-state"><div class="icon">🔍</div><p>Awaiting scan...</p></div>`;
+      }
+
+      // ─── Drag & Drop ────────────────────────────────────────────────────────────
+      function dragOver(e, zoneId) {
+        e.preventDefault();
+        document.getElementById(zoneId).classList.add("drag-over");
+      }
+      function dragLeave(zoneId) {
+        document.getElementById(zoneId).classList.remove("drag-over");
+      }
+      function dropFile(e, inputId, zoneId) {
+        e.preventDefault();
+        dragLeave(zoneId);
+        const file = e.dataTransfer.files[0];
+        if (!file) return;
+        const input = document.getElementById(inputId);
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        input.files = dt.files;
+        input.dispatchEvent(new Event("change"));
+      }
+
+      // ─── Scan Line ────────────────────────────────────────────────────────────────
+      function startScan() {
+        document.getElementById("camWrap").classList.add("scanning");
+        setTimeout(
+          () => document.getElementById("camWrap").classList.remove("scanning"),
+          250
+        );
+      }
+
+      // ─── Identify ─────────────────────────────────────────────────────────────────
+      async function identifyImage(imageData) {
+        document.getElementById("idResultContent").innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;color:var(--text2);padding:30px 0">
+      <div class="spinner"></div>
+      <span style="font-family:'Space Mono',monospace;font-size:0.8rem">Scanning face database...</span>
+    </div>`;
+        try {
+          const res = await fetch("/api/identify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image: imageData }),
+          });
+          const data = await res.json();
+          renderIdResult(data);
+        } catch (e) {
+          renderIdError("Network error: " + e.message);
+        }
+      }
+
+      function renderIdResult(data) {
+        if (!data.success) return renderIdError(data.error);
+        if (!data.matched) {
+          document.getElementById("idResultContent").innerHTML = `
+      <div class="result-panel result-unmatched">
+        <div class="result-inner">
+          <div class="result-header">
+            <div class="result-icon">❌</div>
+            <div class="result-title">NOT FOUND</div>
+          </div>
+          <p style="color:var(--text2);font-size:0.9rem">No matching person found in the database. Please register them first.</p>
+        </div>
+      </div>`;
+          toast("No match found", "error");
+          return;
+        }
+        const p = data.person;
+        const photoEl = p.photo
+          ? `<img class="person-photo" src="${p.photo}" alt="Photo">`
+          : `<div class="person-photo-placeholder">👤</div>`;
+        const ageBadge =
+          p.classification === "Adult"
+            ? `<span class="badge badge-adult">★ ADULT</span>`
+            : `<span class="badge badge-teen">⬥ TEEN</span>`;
+        const genderBadge =
+          p.gender === "Male"
+            ? `<span class="badge badge-male">♂ ${p.gender}</span>`
+            : p.gender === "Female"
+            ? `<span class="badge badge-female">♀ ${p.gender}</span>`
+            : `<span class="badge">${p.gender}</span>`;
+
+        document.getElementById("idResultContent").innerHTML = `
+    <div class="result-panel result-matched">
+      <div class="result-inner">
+        <div class="result-header">
+          <div class="result-icon">✅</div>
+          <div class="result-title">MATCH FOUND</div>
+        </div>
+        <div class="person-card">
+          ${photoEl}
+          <div class="info-grid">
+            <div class="info-item"><div class="info-label">Name</div><div class="info-value" style="color:var(--cyan2);font-weight:700">${p.name}</div></div>
+            <div class="info-item"><div class="info-label">Age</div><div class="info-value">${p.age} years</div></div>
+            <div class="info-item"><div class="info-label">Classification</div><div class="info-value">${ageBadge}</div></div>
+            <div class="info-item"><div class="info-label">Gender</div><div class="info-value">${genderBadge}</div></div>
+            <div class="info-item" style="grid-column:1/-1"><div class="info-label">Academic Course</div><div class="info-value">${p.course}</div></div>
+          </div>
+        </div>
+        <div class="confidence-bar-wrap">
+          <div class="confidence-label"><span>Match Confidence</span><span style="color:var(--green)">${data.confidence}%</span></div>
+          <div class="confidence-bar"><div class="confidence-fill" id="confFill" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>`;
+        setTimeout(() => {
+          const f = document.getElementById("confFill");
+          if (f) f.style.width = data.confidence + "%";
+        }, 100);
+        toast("Person identified: " + p.name, "success");
+      }
+
+      function renderIdError(msg) {
+        document.getElementById("idResultContent").innerHTML = `
+    <div class="result-panel result-unmatched">
+      <div class="result-inner">
+        <div class="result-header">
+          <div class="result-icon">⚠️</div>
+          <div class="result-title">ERROR</div>
+        </div>
+        <p style="color:var(--text2);font-size:0.9rem">${msg}</p>
+      </div>
+    </div>`;
+        toast(msg, "error");
+      }
+
+      // ─── Register ─────────────────────────────────────────────────────────────────
+      function updateRegPreview() {
+        const name = document.getElementById("regName").value;
+        const age = document.getElementById("regAge").value;
+        const gender = document.getElementById("regGender").value;
+        const course = document.getElementById("regCourse").value;
+        if (!name && !age && !regImageData) return;
+        const classification = age
+          ? parseInt(age) >= 18
+            ? "Adult"
+            : "Teen"
+          : "—";
+        const photoEl = regImageData
+          ? `<img class="person-photo" src="${regImageData}" alt="Photo" style="margin:0 auto 16px;display:block">`
+          : `<div class="person-photo-placeholder" style="margin:0 auto 16px;display:flex">👤</div>`;
+        document.getElementById("regPreviewContent").innerHTML = `
+    ${photoEl}
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">Name</div><div class="info-value" style="color:var(--cyan)">${
+        name || "—"
+      }</div></div>
+      <div class="info-item"><div class="info-label">Age</div><div class="info-value">${
+        age || "—"
+      }</div></div>
+      <div class="info-item"><div class="info-label">Classification</div><div class="info-value"><span class="badge ${
+        classification === "Adult" ? "badge-adult" : "badge-teen"
+      }">${classification}</span></div></div>
+      <div class="info-item"><div class="info-label">Gender</div><div class="info-value">${
+        gender || "—"
+      }</div></div>
+      <div class="info-item" style="grid-column:1/-1"><div class="info-label">Course</div><div class="info-value">${
+        course || "—"
+      }</div></div>
+    </div>`;
+      }
+
+      // Live preview updates
+      ["regName", "regAge", "regGender", "regCourse"].forEach((id) => {
+        document.getElementById(id).addEventListener("input", updateRegPreview);
+        document
+          .getElementById(id)
+          .addEventListener("change", updateRegPreview);
+      });
+
+      async function registerPerson() {
+        const name = document.getElementById("regName").value.trim();
+        const age = parseInt(document.getElementById("regAge").value);
+        const gender = document.getElementById("regGender").value;
+        const course = document.getElementById("regCourse").value.trim();
+        if (!name || !age || !gender || !course)
+          return toast("Please fill in all fields", "error");
+        if (!regImageData)
+          return toast("Please capture or upload a photo", "error");
+
+        const btn = document.getElementById("btnRegister");
+        btn.disabled = true;
+        btn.innerHTML = '<div class="spinner"></div> Registering...';
+
+        try {
+          const res = await fetch("/api/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name,
+              age,
+              gender,
+              course,
+              image: regImageData,
+            }),
+          });
+          const data = await res.json();
+          if (data.success) {
+            toast(data.message, "success");
+            clearRegForm();
+          } else toast(data.error, "error");
+        } catch (e) {
+          toast("Network error", "error");
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = "⊕ Register Person";
+      }
+
+      function clearRegForm() {
+        ["regName", "regAge", "regCourse"].forEach(
+          (id) => (document.getElementById(id).value = "")
+        );
+        document.getElementById("regGender").value = "";
+        regImageData = null;
+        document.getElementById("regImgPreview").style.display = "none";
+        document.getElementById("regFileInput").value = "";
+        document.getElementById(
+          "regPreviewContent"
+        ).innerHTML = `<div class="empty-state"><div class="icon">👤</div><p>Fill in details and capture a photo</p></div>`;
+        stopRegCamera();
+      }
+
+      // ─── Database ─────────────────────────────────────────────────────────────────
+      async function loadDatabase() {
+        try {
+          const [dbRes, statRes] = await Promise.all([
+            fetch("/api/persons"),
+            fetch("/api/stats"),
+          ]);
+          const db = await dbRes.json();
+          const stats = await statRes.json();
+
+          document.getElementById("statTotal").textContent = stats.total;
+          document.getElementById("statAdults").textContent = stats.adults;
+          document.getElementById("statTeens").textContent = stats.teens;
+
+          const tbody = document.getElementById("dbTableBody");
+          if (!db.persons.length) {
+            tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="icon">📭</div><p>No persons registered yet</p></div></td></tr>`;
+            return;
+          }
+          tbody.innerHTML = db.persons
+            .map(
+              (p) => `
+      <tr>
+        <td>${
+          p.photo
+            ? `<img class="thumb" src="${p.photo}" alt="">`
+            : `<div class="thumb-placeholder">👤</div>`
+        }</td>
+        <td style="font-weight:500;color:var(--cyan2)">${p.name}</td>
+        <td>${p.age}</td>
+        <td><span class="badge ${
+          p.classification === "Adult" ? "badge-adult" : "badge-teen"
+        }">${p.classification}</span></td>
+        <td>${p.gender}</td>
+        <td style="color:var(--text2)">${p.course}</td>
+        <td style="font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--text3)">${new Date(
+          p.registered_at
+        ).toLocaleDateString()}</td>
+        <td><button class="btn btn-danger" onclick="deletePerson(${p.id},'${
+                p.name
+              }')">✕ Remove</button></td>
+      </tr>`
+            )
+            .join("");
+        } catch (e) {
+          toast("Failed to load database", "error");
+        }
+      }
+
+      async function deletePerson(id, name) {
+        if (!confirm(`Remove "${name}" from database?`)) return;
+        const res = await fetch(`/api/persons/${id}`, { method: "DELETE" });
+        const data = await res.json();
+        if (data.success) {
+          toast(`${name} removed`, "info");
+          loadDatabase();
+        }
+      }
+    </script>
+  </body>
+</html>
