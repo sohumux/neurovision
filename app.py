@@ -112,7 +112,7 @@ def pil_to_jpeg_bytes(img: Image.Image) -> bytes:
 #  Detector priority: opencv (~0.05s) → ssd (~0.1s) → mtcnn (~0.3s)
 #  Pass numpy array directly — no temp file I/O
 # ═══════════════════════════════════════════════════════════════════════════════
-DETECTORS  = ['opencv', 'ssd', 'mtcnn']
+DETECTORS  = ['opencv', ]
 MODEL_NAME = 'Facenet512'
 THRESHOLD  = 0.70
 
