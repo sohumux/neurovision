@@ -26,7 +26,7 @@ def load_model_once():
         dummy = np.ones((160, 160, 3), dtype=np.uint8) * 128
         DeepFace.represent(
             img_path          = dummy,
-            model_name        = 'Facenet512',
+            model_name        = 'Facenet',
             enforce_detection = False,
             detector_backend  = 'skip',
         )
