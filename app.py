@@ -398,8 +398,6 @@ def get_stats():
 
 # ═══════════════════════════════════════════════════════════════════════════════
 if __name__ == '__main__':
-    load_model_once()       # warm model before accepting requests
-    refresh_db_cache()      # load embeddings into RAM
     app.run(
         debug     = False,
         host      = '0.0.0.0',
